@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TODO List</title>
+</head>
+<body>
+    <h1>Hello! This is your todo list</h1>
+    <form action="/add" method="post">
+        <input type="text" id="task" placeholder="Your task" name="task" required>
+        <input type="submit">
+    </form>
+    
+    <table>
+        {% for task in tasks %}
+        <tr id="task-{{ task[0] }}">  <!-- Add unique row ID -->
+            <td>{{ task[1] }}</td>
+            <td> <input type="checkbox" id="checkbox" {% if task[2] %}checked{% endif %} onchange="markDone('{{task[0]}}', event)"></td>
+            <td>
+                <button onclick="deleteTask('{{ task[0] }}')">
+                    <img src="{{ url_for('static', path='images/trash_bin.png') }}" width="10px" height="10px">
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+    <script>
+        function deleteTask(taskId) {
+            taskId = Number(taskId);  // Ensure taskId is a number
+            
+            fetch("/delete", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ task_id: taskId, update: false })  // Send task_id and update flag
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Deleted task successfully") {
+                    // Remove the task row from the UI
+                    let row = document.getElementById(`task-${taskId}`);
+                    if (row) {
+                        row.remove();
+                    }
+                }
+            }) 
+            .catch(error => console.error("Error:", error));
+        };
+        function markDone(taskId, event) {
+            taskId = String(taskId);  // Ensure taskId is a string
+            const checkbox = event.target;
+            let status = false; 
+            if (checkbox.checked) {
+                status = true;  // Set checkbox status to true if checked
+            }
+            console.log(checkbox.checked);
+            console.log("Sending taskId:", taskId, "with status:", status); // Debugging output
+
+            fetch("/checkbox", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ task_id: taskId, update: status })  // Correct the key name to match your FastAPI model
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response:", data);  // Debugging output
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
