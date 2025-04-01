@@ -13,7 +13,7 @@
     
     <table>
         {% for task in tasks %}
-        <tr id="task-{{ task[0] }}">  <!-- Add unique row ID -->
+        <tr id="task-{{ task[0] }}">
             <td>{{ task[1] }}</td>
             <td> <input type="checkbox" id="checkbox" {% if task[2] %}checked{% endif %} onchange="markDone('{{task[0]}}', event)"></td>
             <td>
@@ -27,7 +27,7 @@
     </table>
     <script>
         function deleteTask(taskId) {
-            taskId = Number(taskId);  // Ensure taskId is a number
+            taskId = Number(taskId);
             
             fetch("/delete", {
                 method: "DELETE",
@@ -47,14 +47,12 @@
             .catch(error => console.error("Error:", error));
         };
         function markDone(taskId, event) {
-            taskId = String(taskId);  // Ensure taskId is a string
+            taskId = String(taskId);
             const checkbox = event.target;
             let status = false; 
             if (checkbox.checked) {
                 status = true;  // Set checkbox status to true if checked
             }
-            console.log(checkbox.checked);
-            console.log("Sending taskId:", taskId, "with status:", status); // Debugging output
 
             fetch("/checkbox", {
                 method: "PUT",
@@ -62,9 +60,6 @@
                 body: JSON.stringify({ task_id: taskId, update: status })  // Correct the key name to match your FastAPI model
             })
             .then(response => response.json())
-            .then(data => {
-                console.log("Response:", data);  // Debugging output
-            })
             .catch(error => console.error("Error:", error));
         }
     </script>
