@@ -1,9 +1,21 @@
-from fastapi import Form, APIRouter
+from fastapi import Form, APIRouter, Request
 from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
 from app.database import *
 from app.schemas import *
 
 router = APIRouter()
+# Load templates
+templates = Jinja2Templates(directory="templates")
+
+# Main page
+@router.get("/")
+def homepage(request: Request):
+    print(get_tasks())
+    return templates.TemplateResponse("index.html",{
+        "request": request,
+        "tasks": get_tasks()
+    })
 
 # Add task
 @router.post("/add")
@@ -22,3 +34,8 @@ def delete_task(data: DeleteRequest):
 def update_checkbox(data: UpdateRequest):
     update_checked(data)
     return {"message": "Updated checkbox"}
+
+# Disconnect database
+@router.on_event("shutdown")
+def shutdown():
+    disconnect_db()
