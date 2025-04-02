@@ -1,61 +1,33 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
-from prisma import Prisma
-from pydantic import BaseModel
+from app.routes.tasks import *
 
 # Load app
 app = FastAPI()
-# Load database
-db = Prisma()
+app.include_router(router)
 # Load templates
 templates = Jinja2Templates(directory="templates")
-
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Connect to database when the server started
+# Connect to database
 @app.on_event("startup")
 async def startup():
-    await db.connect()
+    await connect_db()
 
-# Disconnect database when closing the server
+# Disconnect database
 @app.on_event("shutdown")
 async def shutdown():
-    await db.disconnect()
+    await disconnect_db()
 
 # Main page
 @app.get("/")
 async def homepage(request: Request):
-    tasks = await db.item.find_many()
-    tasks = [(task.id, task.item, task.checked) for task in tasks]
     return templates.TemplateResponse("index.html",{
         "request": request,
-        "tasks": tasks
+        "tasks": await get_tasks()
     })
-
-# Get task
-@app.post("/add")
-async def submit_form(task: str = Form(...)):
-    await db.item.create({"item": task, "checked": False})
-    return RedirectResponse(url="/", status_code=303)
-
-class DeleteRequest(BaseModel):
-    task_id: int
-    update: bool
-
-# Delete task
-@app.delete("/delete")
-async def delete_task(data: DeleteRequest):
-    await db.item.delete(where={"id": data.task_id})
-    return {"message": "Deleted task successfully"}
-
-# Update checkbox
-@app.put("/checkbox")
-async def update_checkbox(data: DeleteRequest):
-    await db.item.update(data={"checked": data.update}, where={"id": data.task_id})
-    return {"message": "Updated checkbox"}
 
 if __name__ == "__main__":
     import uvicorn
