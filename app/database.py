@@ -1,30 +1,48 @@
-from prisma import Prisma
+from sqlalchemy import create_engine, Column, String, INTEGER, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-# Load database
-db = Prisma()
+Base = declarative_base()
 
-# Connect to database
-async def connect_db():
-    await db.connect()
+class Tasks(Base):
+    __tablename__ = "tasks"
 
-# Disconnect database
-async def disconnect_db():
-    await db.disconnect()
+    id = Column("id", INTEGER, primary_key=True, autoincrement=True)
+    task = Column("task", String, nullable=False)
+    checked = Column("checked", Boolean, default=False)
+    def __init__(self, task, checked):
+        self.task = task
+        self.checked = checked
+
+engine = create_engine("sqlite:///tasks.db", echo=True)
+Base.metadata.create_all(bind=engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Close session
+def disconnect_db():
+    session.close()
 
 # Get all tasks
-async def get_tasks():
-    tasks = await db.item.find_many()
-    tasks = [(task.id, task.item, task.checked) for task in tasks]
-    return tasks
+def get_tasks():
+    tasks = session.query(Tasks).all()
+    return [[task.id, task.task, task.checked] for task in tasks]
 
-# Delete task from database
-async def delete_task_by_id(id):
-    await db.item.delete(where={"id": id})
+# Delete task by id
+def delete_task_by_id(id):
+    task = session.query(Tasks).filter(Tasks.id == id).first()
+    session.delete(task)
+    session.commit()
 
-# Update 'checked' value
-async def update_checked(data):
-    await db.item.update(data={"checked": data.update}, where={"id": data.task_id})
+# Update value of 'checked'
+def update_checked(data):
+    task = session.query(Tasks).filter(Tasks.id == data.task_id).first()
+    task.checked = data.update
+    session.commit()
 
 # Create task
-async def create_task(task):
-    await db.item.create({"item": task, "checked": False})
+def create_task(task):
+    task = Tasks(task, False)
+    session.add(task)
+    session.commit()

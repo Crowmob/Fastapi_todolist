@@ -7,18 +7,18 @@ router = APIRouter()
 
 # Add task
 @router.post("/add")
-async def submit_form(task: str = Form(...)):
-    await create_task(task)
+def submit_form(task: str = Form(...)):
+    create_task(task)
     return RedirectResponse(url="/", status_code=303)
 
 # Delete task
 @router.delete("/delete")
-async def delete_task(data: DeleteRequest):
-    await delete_task_by_id(data.task_id)
+def delete_task(data: DeleteRequest):
+    delete_task_by_id(data.task_id)
     return {"message": "Deleted task successfully"}
 
 # Update checkbox
 @router.put("/checkbox")
-async def update_checkbox(data: UpdateRequest):
-    await update_checked(data)
+def update_checkbox(data: UpdateRequest):
+    update_checked(data)
     return {"message": "Updated checkbox"}

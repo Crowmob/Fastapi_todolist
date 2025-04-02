@@ -11,22 +11,18 @@ templates = Jinja2Templates(directory="templates")
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Connect to database
-@app.on_event("startup")
-async def startup():
-    await connect_db()
-
 # Disconnect database
 @app.on_event("shutdown")
-async def shutdown():
-    await disconnect_db()
+def shutdown():
+    disconnect_db()
 
 # Main page
 @app.get("/")
-async def homepage(request: Request):
+def homepage(request: Request):
+    print(get_tasks())
     return templates.TemplateResponse("index.html",{
         "request": request,
-        "tasks": await get_tasks()
+        "tasks": get_tasks()
     })
 
 if __name__ == "__main__":
