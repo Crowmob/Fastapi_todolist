@@ -1,4 +1,4 @@
-from db.repository import *
+from project.repository import *
 
 def createTask(task):
     create_task(task)

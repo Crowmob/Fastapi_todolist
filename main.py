@@ -1,12 +1,22 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from project.controller import *
+import json
 
 # Load project
-app = FastAPI()
+app = FastAPI(
+    title="My To-Do List API",
+    description="API documentation for managing to-do tasks",
+    version="1.0.0",
+)
+
 app.include_router(router)
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
+def save_openapi_json():
+    with open("openapi.json", "w") as f:
+        json.dump(app.openapi(), f, indent=4)
+
+# Run this function at startup
+save_openapi_json()
 
 if __name__ == "__main__":
     import uvicorn

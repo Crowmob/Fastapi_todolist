@@ -1,38 +1,36 @@
-from fastapi import Form, APIRouter, Request
-from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import APIRouter
 from project.services import *
 from project.schemas import *
 
 router = APIRouter()
-# Load templates
-templates = Jinja2Templates(directory="templates")
 
-# Main page
 @router.get("/")
-def homepage(request: Request):
-    return templates.TemplateResponse("index.html",{
-        "request": request,
-        "tasks": getTasks()
-    })
+def homepage():
+    return getTasks()
 
 # Add task
 @router.post("/add")
-def submit_form(task: str = Form(...)):
+def submit_form(task):
     createTask(task)
-    return RedirectResponse(url="/", status_code=303)
+    return {"message": "Added task"}
 
 # Delete task
 @router.delete("/delete")
 def delete_task(data: DeleteRequest):
-    deleteTaskById(data.task_id)
-    return {"message": "Deleted task successfully"}
+    try:
+        deleteTaskById(data.task_id)
+        return {"message": "Deleted task successfully"}
+    except:
+        return {"message": "Task does not exists"}
 
 # Update checkbox
 @router.put("/checkbox")
 def update_checkbox(data: UpdateRequest):
-    updateChecked(data)
-    return {"message": "Updated checkbox"}
+    try:
+        updateChecked(data)
+        return {"message": "Updated checkbox"}
+    except:
+        return {"message": "Task does not exists"}
 
 # Disconnect database
 @router.on_event("shutdown")
