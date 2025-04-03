@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from app.routes.tasks import *
+from project.controller import *
 
-# Load app
+# Load project
 app = FastAPI()
 app.include_router(router)
 # Mount static files

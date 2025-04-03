@@ -18,7 +18,7 @@
             <td> <input type="checkbox" id="checkbox" {% if task[2] %}checked{% endif %} onchange="markDone('{{task[0]}}', event)"></td>
             <td>
                 <button onclick="deleteTask('{{ task[0] }}')">
-                    <img src="{{ url_for('static', path='images/trash_bin.png') }}" width="10px" height="10px">
+                    <img src="{{ url_for('static', path='trash_bin.png') }}" width="10px" height="10px">
                 </button>
             </td>
         </tr>

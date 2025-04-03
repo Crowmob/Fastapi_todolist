@@ -1,5 +1,5 @@
 from sqlalchemy.orm import sessionmaker
-from app.models import *
+from project.models import *
 
 DATABASE_URL = "postgresql://postgres:valera10z@localhost:5432/tasks"
 
