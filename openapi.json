@@ -129,6 +129,42 @@
                     }
                 }
             }
+        },
+        "/send-email": {
+            "put": {
+                "summary": "Sendemail",
+                "operationId": "sendEmail_send_email_put",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendEmail"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -159,21 +195,44 @@
                 "type": "object",
                 "title": "HTTPValidationError"
             },
+            "SendEmail": {
+                "properties": {
+                    "subject": {
+                        "type": "string",
+                        "title": "Subject"
+                    },
+                    "body": {
+                        "type": "string",
+                        "title": "Body"
+                    },
+                    "to_email": {
+                        "type": "string",
+                        "title": "To Email"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "subject",
+                    "body",
+                    "to_email"
+                ],
+                "title": "SendEmail"
+            },
             "UpdateRequest": {
                 "properties": {
                     "task_id": {
                         "type": "integer",
                         "title": "Task Id"
                     },
-                    "update": {
+                    "is_done": {
                         "type": "boolean",
-                        "title": "Update"
+                        "title": "Is Done"
                     }
                 },
                 "type": "object",
                 "required": [
                     "task_id",
-                    "update"
+                    "is_done"
                 ],
                 "title": "UpdateRequest"
             },

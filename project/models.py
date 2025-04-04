@@ -9,7 +9,7 @@ class Tasks(Base):
 
     id = Column("id", INTEGER, primary_key=True, autoincrement=True)
     task = Column("task", String, nullable=False)
-    checked = Column("checked", Boolean, default=False)
-    def __init__(self, task, checked):
+    is_done = Column("is_done", Boolean, default=False)
+    def __init__(self, task, is_done):
         self.task = task
-        self.checked = checked
+        self.is_done = is_done
