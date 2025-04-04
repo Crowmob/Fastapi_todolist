@@ -1,25 +1,33 @@
 from db.database import *
 
 # Create task
-def create_task(task):
-    task = Tasks(task, False)
-    session.add(task)
-    session.commit()
+async def create_task(task):
+    async with async_session_maker() as session:
+        await session.execute(text("INSERT INTO tasks (task, checked) VALUES (:task, :checked);"), {"task": task, "checked": False})
+        await session.commit()
 
 # Read tasks
-def get_tasks():
-    tasks = session.query(Tasks).all()
-    return [[task.id, task.task, task.checked] for task in tasks]
+async def get_tasks():
+    async with async_session_maker() as session:
+        tasks = await session.execute(text('SELECT * FROM tasks;'))
+        return [[task.id, task.task, task.checked] for task in tasks]
+
+# Get task by id
+async def get_task_by_id(id):
+    async with async_session_maker() as session:
+        task = await session.execute(text("SELECT * FROM tasks WHERE id = :id"), {"id": id})
+        return task.fetchone()
 
 # Update value of 'checked'
-def update_checked(data):
-    task = session.query(Tasks).filter(Tasks.id == data.task_id).first()
-    task.checked = data.update
-    session.commit()
+async def update_checked(data):
+    async with async_session_maker() as session:
+        await session.execute(text("UPDATE tasks SET checked = :checked WHERE id = :id"), {"id": data.task_id, "checked": data.update})
+        await session.commit()
 
 # Delete task by id
-def delete_task_by_id(id):
-    task = session.query(Tasks).filter(Tasks.id == id).first()
-    session.delete(task)
-    session.commit()
+async def delete_task_by_id(id):
+    async with async_session_maker() as session:
+        await session.execute(text("DELETE FROM tasks WHERE id = :id"), {"id": id})
+        await session.commit()
+
 

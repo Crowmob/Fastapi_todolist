@@ -1,13 +1,13 @@
 from project.repository import *
 
-def createTask(task):
-    create_task(task)
+async def createTask(task):
+     await create_task(task)
 
-def getTasks():
-    return get_tasks()
+async def getTasks():
+    return await get_tasks()
 
-def updateChecked(data):
-    update_checked(data)
+async def updateChecked(data):
+    await update_checked(data)
 
-def deleteTaskById(id):
-    delete_task_by_id(id)
+async def deleteTaskById(id):
+    await delete_task_by_id(id)

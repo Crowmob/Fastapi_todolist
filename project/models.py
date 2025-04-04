@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine, Column, String, INTEGER, Boolean
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy import Column, String, INTEGER, Boolean, text
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()

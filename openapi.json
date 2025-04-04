@@ -24,8 +24,8 @@
         },
         "/add": {
             "post": {
-                "summary": "Submit Form",
-                "operationId": "submit_form_add_post",
+                "summary": "Add Task",
+                "operationId": "add_task_add_post",
                 "parameters": [
                     {
                         "name": "task",

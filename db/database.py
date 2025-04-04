@@ -1,14 +1,14 @@
-from sqlalchemy.orm import sessionmaker
+import dotenv
 from project.models import *
+import os
 
-DATABASE_URL = "postgresql://postgres:valera10z@localhost:5432/tasks"
+dotenv.load_dotenv()
+db_url = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL)
-Base.metadata.create_all(bind=engine)
-
-Session = sessionmaker(bind=engine)
-session = Session()
+engine = create_async_engine(db_url, echo=True)
+async_session_maker = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 # Close session
-def disconnect_db():
-    session.close()
+async def disconnect_db():
+    async with async_session_maker() as session:
+        await session.close()
