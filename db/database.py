@@ -1,5 +1,6 @@
 import dotenv
-from project.models import *
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy import text
 import os
 
 dotenv.load_dotenv()

@@ -23,6 +23,6 @@ def send_email(sending_data):
             server.starttls()
             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
             server.send_message(msg)
-            print("Email sent successfully!")
+            return "Email sent successfully!"
     except Exception as e:
-        print(f"Error sending email: {e}")
+        return f"Error sending email: {e}"
