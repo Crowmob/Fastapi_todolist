@@ -23,7 +23,7 @@ async def register(log: Login, response: Response):
     await registerUser(log.username, log.password)
     data = {"username": log.username, "password": log.password}
     token = create_token(data)
-    response.set_cookie(key="user", value=token, max_age=60)
+    response.set_cookie(key="user", value=token, max_age=1800)
     return "You are registered!"
 
 # Login
@@ -33,7 +33,7 @@ async def login(log: Login, response: Response):
     if not user: return {"message": "You don't have an account! Register."}
     data = {"username": log.username, "password": log.password}
     token = create_token(data)
-    response.set_cookie(key="user", value=token, max_age=60)
+    response.set_cookie(key="user", value=token, max_age=1800)
     return "You are logged in!"
 
 # Add task
