@@ -22,11 +22,108 @@
                 }
             }
         },
-        "/add": {
+        "/filtered_tasks": {
+            "get": {
+                "summary": "Get Filtered Tasks",
+                "operationId": "get_filtered_tasks_filtered_tasks_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "summary": "Register",
+                "operationId": "register_register_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Login"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "summary": "Login",
+                "operationId": "login_login_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Login"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/{username}/add": {
             "post": {
                 "summary": "Add Task",
-                "operationId": "add_task_add_post",
+                "operationId": "add_task__username__add_post",
                 "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Username"
+                        }
+                    },
                     {
                         "name": "task",
                         "in": "query",
@@ -58,19 +155,30 @@
                 }
             }
         },
-        "/delete": {
+        "/{username}/delete": {
             "delete": {
                 "summary": "Delete Task",
-                "operationId": "delete_task_delete_delete",
+                "operationId": "delete_task__username__delete_delete",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Username"
+                        }
+                    }
+                ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/DeleteRequest"
                             }
                         }
-                    },
-                    "required": true
+                    }
                 },
                 "responses": {
                     "200": {
@@ -94,19 +202,30 @@
                 }
             }
         },
-        "/checkbox": {
+        "/{username}/checkbox": {
             "put": {
                 "summary": "Update Checkbox",
-                "operationId": "update_checkbox_checkbox_put",
+                "operationId": "update_checkbox__username__checkbox_put",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Username"
+                        }
+                    }
+                ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/UpdateRequest"
                             }
                         }
-                    },
-                    "required": true
+                    }
                 },
                 "responses": {
                     "200": {
@@ -171,14 +290,14 @@
         "schemas": {
             "DeleteRequest": {
                 "properties": {
-                    "task_id": {
-                        "type": "integer",
-                        "title": "Task Id"
+                    "task": {
+                        "type": "string",
+                        "title": "Task"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "task_id"
+                    "task"
                 ],
                 "title": "DeleteRequest"
             },
@@ -194,6 +313,24 @@
                 },
                 "type": "object",
                 "title": "HTTPValidationError"
+            },
+            "Login": {
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "title": "Username"
+                    },
+                    "password": {
+                        "type": "string",
+                        "title": "Password"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "title": "Login"
             },
             "SendEmail": {
                 "properties": {
@@ -220,9 +357,9 @@
             },
             "UpdateRequest": {
                 "properties": {
-                    "task_id": {
-                        "type": "integer",
-                        "title": "Task Id"
+                    "task": {
+                        "type": "string",
+                        "title": "Task"
                     },
                     "is_done": {
                         "type": "boolean",
@@ -231,7 +368,7 @@
                 },
                 "type": "object",
                 "required": [
-                    "task_id",
+                    "task",
                     "is_done"
                 ],
                 "title": "UpdateRequest"
