@@ -18,7 +18,7 @@ async def get_filtered_tasks():
 # Register
 @router.post("/register")
 async def register(log: Login, response: Response):
-    user = await getUser(log.username, log.password)
+    user = await getUserId(log.username, log.password)
     if user:return {"message": "You have been already registered! Login."}
     await createUser(log.username, log.password)
     data = {"username": log.username, "password": log.password}
@@ -29,7 +29,7 @@ async def register(log: Login, response: Response):
 # Login
 @router.post("/login")
 async def login(log: Login, response: Response):
-    user = await getUser(log.username, log.password)
+    user = await getUserId(log.username, log.password)
     if not user: return {"message": "You don't have an account! Register."}
     data = {"username": log.username, "password": log.password}
     token = create_token(data)
@@ -39,7 +39,7 @@ async def login(log: Login, response: Response):
 # Add task
 @router.post("/{username}/add")
 async def add_task(task, request: Request, username: str):
-    res = await get_user(request, username, None)
+    res = await check_user(request, username, None)
     if len(res) == 1: return res
     user_id = res[0]
     await createTask(task, user_id)
@@ -48,7 +48,7 @@ async def add_task(task, request: Request, username: str):
 # Delete task
 @router.delete("/{username}/delete")
 async def delete_task(data: DeleteRequest, username: str, request: Request):
-    res = await get_user(request, username, data)
+    res = await check_user(request, username, data)
     if len(res) == 1: return res
     user_id, is_task = res
     if is_task is None:
@@ -60,7 +60,7 @@ async def delete_task(data: DeleteRequest, username: str, request: Request):
 # Update checkbox
 @router.put("/{username}/checkbox")
 async def update_checkbox(request: Request, username: str, data: UpdateRequest):
-    res = await get_user(request, username, data)
+    res = await check_user(request, username, data)
     if len(res) == 1: return res
     user_id, is_task = res
     if is_task is None:

@@ -2,7 +2,7 @@ from jose import jwt, JWTError
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
-from project.services.services import getUser, getTask
+import bcrypt
 
 load_dotenv()
 
@@ -25,12 +25,22 @@ def decode_token(token: str):
     except JWTError:
         return None
 
-async def get_user(request, username, data):
+async def check_user(request, username, data):
+    from project.services.services import getUserId, getTask
     token = request.cookies.get("user")
     if token == None: return "You are not logged in! Login."
     user = decode_token(token)
     if username != user["username"]: return {"message": "You logged in with another account."}
-    user_id = await getUser(user["username"], user["password"])
+    user_id = await getUserId(user["username"], user["password"])
     try: is_task = await getTask(data.task, user_id)
     except: is_task = None
     return user_id, is_task
+
+def hash_password(password):
+    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    return hashed
+
+def check_password(password, hashed_password):
+    if bcrypt.checkpw(password, hashed_password):
+        return True
+    return False

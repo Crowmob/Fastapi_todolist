@@ -33,11 +33,11 @@ async def delete_task(task, user_id):
 
 
 # Get user
-async def get_user(username, password):
+async def get_user(username):
     async with async_session_maker() as session:
         user = await session.execute(
-            text("SELECT id FROM users WHERE username=:username AND password=:password"),
-            {"username": username, "password": password})
+            text("SELECT id, username, password FROM users WHERE username=:username"),
+            {"username": username})
         rows = user.fetchall()
         return [dict(row._mapping) for row in rows]
 
