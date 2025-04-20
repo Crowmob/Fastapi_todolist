@@ -22,5 +22,5 @@ async def getUser(username, password):
 async def filteredTasks():
     return await filtered_tasks()
 
-async def registerUser(username, password):
-    await register_user(username, password)
+async def createUser(username, password):
+    await create_user(username, password)

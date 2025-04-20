@@ -41,8 +41,8 @@ async def get_user(username, password):
         rows = user.fetchall()
         return [dict(row._mapping) for row in rows]
 
-# Login
-async def register_user(username, password):
+# Create user
+async def create_user(username, password):
     async with async_session_maker() as session:
         await session.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"),
                               {"username": username, "password": password})

@@ -2,6 +2,8 @@ from jose import jwt, JWTError
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+from project.services.services import getUser, getTask
+
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -22,3 +24,13 @@ def decode_token(token: str):
         return payload
     except JWTError:
         return None
+
+async def get_user(request, username, data):
+    token = request.cookies.get("user")
+    if token == None: return "You are not logged in! Login."
+    user = decode_token(token)
+    if username != user["username"]: return {"message": "You logged in with another account."}
+    user_id = await getUser(user["username"], user["password"])
+    try: is_task = await getTask(data.task, user_id)
+    except: is_task = None
+    return user_id, is_task

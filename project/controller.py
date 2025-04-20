@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Response
 from project.services.services import *
 from project.schemas import *
 from project.services.email_service import send_email
-from project.jwt_handler import *
+from project.auth import *
 
 router = APIRouter()
 
@@ -20,7 +20,7 @@ async def get_filtered_tasks():
 async def register(log: Login, response: Response):
     user = await getUser(log.username, log.password)
     if user:return {"message": "You have been already registered! Login."}
-    await registerUser(log.username, log.password)
+    await createUser(log.username, log.password)
     data = {"username": log.username, "password": log.password}
     token = create_token(data)
     response.set_cookie(key="user", value=token, max_age=1800)
@@ -39,24 +39,19 @@ async def login(log: Login, response: Response):
 # Add task
 @router.post("/{username}/add")
 async def add_task(task, request: Request, username: str):
-    token = request.cookies.get("user")
-    if token == None: return "You are not logged in! Login."
-    user = decode_token(token)
-    if username != user["username"]: return {"message": "You logged in with another account."}
-    user_id = await getUser(user["username"], user["password"])
+    res = await get_user(request, username, None)
+    if len(res) == 1: return res
+    user_id = res[0]
     await createTask(task, user_id)
     return {"message": "Added task successfully"}
 
 # Delete task
 @router.delete("/{username}/delete")
 async def delete_task(data: DeleteRequest, username: str, request: Request):
-    token = request.cookies.get("user")
-    if token == None: return "You are not logged in! Login."
-    user = decode_token(token)
-    if username != user["username"]: return {"message": "You logged in with another account."}
-    user_id = await getUser(user["username"], user["password"])
-    task = await getTask(data.task, user_id)
-    if task is None:
+    res = await get_user(request, username, data)
+    if len(res) == 1: return res
+    user_id, is_task = res
+    if is_task is None:
         return {"message": "You don't have this task."}
     else:
         await deleteTask(data.task, user_id)
@@ -65,13 +60,10 @@ async def delete_task(data: DeleteRequest, username: str, request: Request):
 # Update checkbox
 @router.put("/{username}/checkbox")
 async def update_checkbox(request: Request, username: str, data: UpdateRequest):
-    token = request.cookies.get("user")
-    if token == None: return "You are not logged in! Login."
-    user = decode_token(token)
-    if username != user["username"]: return {"message": "You logged in with another account."}
-    user_id = await getUser(user["username"], user["password"])
-    task = await getTask(data.task, user_id)
-    if task is None:
+    res = await get_user(request, username, data)
+    if len(res) == 1: return res
+    user_id, is_task = res
+    if is_task is None:
         return {"message": "You don't have this task."}
     else:
         await updateChecked(data.task, data.is_done, user_id)
