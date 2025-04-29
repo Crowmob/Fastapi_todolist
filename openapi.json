@@ -38,6 +38,42 @@
                 }
             }
         },
+        "/confirm/{token}": {
+            "get": {
+                "summary": "Verify User",
+                "operationId": "verify_user_confirm__token__get",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "title": "Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/register": {
             "post": {
                 "summary": "Register",
@@ -110,75 +146,19 @@
                 }
             }
         },
-        "/{username}/add": {
+        "/add": {
             "post": {
                 "summary": "Add Task",
-                "operationId": "add_task__username__add_post",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "title": "Username"
-                        }
-                    },
-                    {
-                        "name": "task",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "title": "Task"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/{username}/delete": {
-            "delete": {
-                "summary": "Delete Task",
-                "operationId": "delete_task__username__delete_delete",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "title": "Username"
-                        }
-                    }
-                ],
+                "operationId": "add_task_add_post",
                 "requestBody": {
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DeleteRequest"
+                                "$ref": "#/components/schemas/TaskName"
                             }
                         }
-                    }
+                    },
+                    "required": true
                 },
                 "responses": {
                     "200": {
@@ -202,62 +182,51 @@
                 }
             }
         },
-        "/{username}/checkbox": {
-            "put": {
-                "summary": "Update Checkbox",
-                "operationId": "update_checkbox__username__checkbox_put",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "title": "Username"
+        "/delete": {
+            "delete": {
+                "summary": "Delete Task",
+                "operationId": "delete_task_delete_delete",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TaskName"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
                         }
                     }
-                ],
+                }
+            }
+        },
+        "/checkbox": {
+            "put": {
+                "summary": "Update Checkbox",
+                "operationId": "update_checkbox_checkbox_put",
                 "requestBody": {
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/UpdateRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/send-email": {
-            "put": {
-                "summary": "Sendemail",
-                "operationId": "sendEmail_send_email_put",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SendEmail"
                             }
                         }
                     },
@@ -288,19 +257,6 @@
     },
     "components": {
         "schemas": {
-            "DeleteRequest": {
-                "properties": {
-                    "task": {
-                        "type": "string",
-                        "title": "Task"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "task"
-                ],
-                "title": "DeleteRequest"
-            },
             "HTTPValidationError": {
                 "properties": {
                     "detail": {
@@ -316,9 +272,9 @@
             },
             "Login": {
                 "properties": {
-                    "username": {
+                    "email": {
                         "type": "string",
-                        "title": "Username"
+                        "title": "Email"
                     },
                     "password": {
                         "type": "string",
@@ -327,33 +283,23 @@
                 },
                 "type": "object",
                 "required": [
-                    "username",
+                    "email",
                     "password"
                 ],
                 "title": "Login"
             },
-            "SendEmail": {
+            "TaskName": {
                 "properties": {
-                    "subject": {
+                    "task": {
                         "type": "string",
-                        "title": "Subject"
-                    },
-                    "body": {
-                        "type": "string",
-                        "title": "Body"
-                    },
-                    "to_email": {
-                        "type": "string",
-                        "title": "To Email"
+                        "title": "Task"
                     }
                 },
                 "type": "object",
                 "required": [
-                    "subject",
-                    "body",
-                    "to_email"
+                    "task"
                 ],
-                "title": "SendEmail"
+                "title": "TaskName"
             },
             "UpdateRequest": {
                 "properties": {

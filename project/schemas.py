@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 # Create models
-class DeleteRequest(BaseModel):
+class TaskName(BaseModel):
     task: str
 class UpdateRequest(BaseModel):
     task: str
@@ -12,5 +12,5 @@ class SendEmail(BaseModel):
     to_email: str
 
 class Login(BaseModel):
-    username: str
+    email: str
     password: str
