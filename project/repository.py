@@ -47,10 +47,10 @@ async def get_user(id, email):
         return [dict(row._mapping) for row in rows]
 
 # Create user
-async def create_user(email, password):
+async def create_user(email, password, reg_date):
     async with async_session_maker() as session:
-        await session.execute(text("INSERT INTO users (email, password) VALUES (:email, :password)"),
-                              {"email": email, "password": password})
+        await session.execute(text("INSERT INTO users (email, password, registration_date) VALUES (:email, :password, :reg_date)"),
+                              {"email": email, "password": password, "reg_date": reg_date})
         await session.commit()
 
 # Verify user

@@ -1,28 +1,23 @@
 from project.repository import *
 from project.auth import *
 import json
-from redis.asyncio import Redis
-
-redis_client = Redis.from_url("redis://redis-1:6379")
+from project.redis_init import redis_client
 
 async def isSessionValid(user_agent, ip):
-    matching_session = None
+    session = None
     async for key in redis_client.scan_iter(match="session:*"):
         value = await redis_client.get(key)
         if value is None: continue
 
         session_data = json.loads(value)
-        if datetime.fromisoformat(session_data.get("refresh_time")) < datetime.utcnow():
-            await redis_client.delete(key)
-            return None
         if session_data.get("user-agent") == user_agent and session_data.get("ip") == ip:
-            matching_session = {
+            session = {
                 "session_id": key.decode().split("session:")[1],
                 "session_data": session_data
             }
             break
 
-    return matching_session
+    return session
 
 async def createOrUpdateSession(session_data, expiry_time):
     session = await isSessionValid(session_data["user-agent"], session_data["ip"])
