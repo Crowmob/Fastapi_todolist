@@ -5,8 +5,8 @@ from project.cronjobs import start_job
 
 # Load project
 app = FastAPI(
-    title="My To-Do List API",
-    description="API documentation for managing to-do tasks",
+    title="To-Do List",
+    description="Manage your tasks to do",
     version="1.0.0",
 )
 
